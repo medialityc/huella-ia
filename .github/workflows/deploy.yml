@@ -1,0 +1,41 @@
+# Push a main = tests + deploy en CapRover (la imagen se construye en el servidor con el Dockerfile).
+# Secretos del repo: CAPROVER_SERVER, CAPROVER_APP, CAPROVER_APP_TOKEN (ver README).
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-caprover
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Tests
+        run: npm test
+
+      - name: Empaquetar el commit
+        run: git archive --format=tar --output=deploy.tar HEAD
+
+      - name: Deploy a CapRover
+        # El CLI usa -t para --tarFile y --appToken a la vez; por eso todo va por variables de entorno.
+        env:
+          CAPROVER_URL: ${{ secrets.CAPROVER_SERVER }}
+          CAPROVER_APP: ${{ secrets.CAPROVER_APP }}
+          CAPROVER_APP_TOKEN: ${{ secrets.CAPROVER_APP_TOKEN }}
+          CAPROVER_TAR_FILE: deploy.tar
+        run: npx --yes caprover@2.3.1 deploy

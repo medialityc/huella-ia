@@ -24,20 +24,28 @@ El CLI sí permite `localhost` y redes privadas; el servidor web no.
 
 ## Despliegue en CapRover
 
-Usa `captain-definition` + `Dockerfile` (Node 22 Alpine, puerto 3000, healthcheck en `/salud`). `caprover deploy` sube lo que está **commiteado** en git, así que haz commit antes de cada deploy.
+Usa `captain-definition` + `Dockerfile` (Node 22 Alpine, puerto 3000, healthcheck en `/salud`). El deploy lo hace GitHub Actions ([.github/workflows/deploy.yml](.github/workflows/deploy.yml)): en cada push a `main` pasa `npm test` y, si va bien, empaqueta el commit y lo manda a CapRover, que construye la imagen. También se puede lanzar a mano desde la pestaña *Actions* (*Run workflow*).
 
 Primera vez:
 
-1. `npm i -g caprover` (si no lo tienes) y `caprover login` con la URL de tu panel.
-2. En el panel: *Apps* → crear la app (p. ej. `huella-ia`). No necesita *Persistent Data*.
+1. En el panel: *Apps* → crear la app (p. ej. `huella-ia`). No necesita *Persistent Data*.
+2. En la app, pestaña *Deployment* → *Enable App Token* y copia el token.
 3. En la app, *HTTP Settings*:
    - **Container HTTP Port: 3000**.
    - *Enable HTTPS* y luego *Force HTTPS by redirecting all HTTP traffic to HTTPS*.
    - Si usas dominio propio: apunta un registro A al servidor, *Connect New Domain*, y activa HTTPS también para ese dominio.
 4. En *App Configs* → *Environmental Variables*, pon `SITE_URL` con el dominio definitivo (ver tabla). *Save & Update*.
-5. Desde esta carpeta: `caprover deploy` y elige la app.
+5. En GitHub, *Settings* → *Secrets and variables* → *Actions* → *New repository secret*:
 
-Siguientes despliegues: `git commit` y `caprover deploy` (o `caprover deploy -a huella-ia` para no elegir la app).
+   | Secreto | Valor |
+   |---|---|
+   | `CAPROVER_SERVER` | URL del panel, p. ej. `https://captain.tudominio.com` |
+   | `CAPROVER_APP` | nombre de la app en CapRover, p. ej. `huella-ia` |
+   | `CAPROVER_APP_TOKEN` | el token del paso 2 |
+
+6. Push a `main`. El progreso se ve en *Actions* y el build en el panel (*Deployment* → *View build logs*).
+
+Deploy manual sin Actions, si hiciera falta: `caprover deploy` desde la carpeta (sube lo commiteado en git).
 
 Variables:
 
