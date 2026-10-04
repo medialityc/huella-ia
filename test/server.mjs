@@ -39,7 +39,31 @@ try {
   assert.match(sm.headers.get('content-type'), /xml/);
   assert.ok((await sm.text()).includes('<loc>https://huella.ejemplo.com/</loc>'), 'sitemap con la portada');
 
-  for (const [ruta, tipo] of [['/favicon.svg', 'image/svg+xml'], ['/og.png', 'image/png'], ['/apple-touch-icon.png', 'image/png']]) {
+  // JSON-LD con WebSite (nombre del sitio en Google) además de WebApplication
+  const ld = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+  const tipos = (ld['@graph'] || [ld]).map((x) => x['@type']);
+  assert.ok(tipos.includes('WebSite') && tipos.includes('WebApplication'), `JSON-LD con WebSite y WebApplication (${tipos})`);
+  assert.ok(html.includes('<link rel="manifest" href="/site.webmanifest">'), 'enlace al manifest');
+  assert.ok(html.includes('<link rel="icon" href="/favicon.ico" sizes="48x48">'), 'enlace a favicon.ico');
+
+  // Contenido indexable y sin huella propia
+  const { analyze } = await import('../lib/analyzer.mjs');
+  const rep = analyze({ html });
+  assert.ok(rep.meta.palabras >= 400, `al menos 400 palabras visibles (${rep.meta.palabras})`);
+  assert.ok(rep.score <= 25, `la propia página debe quedar en ≤ 25 % (${rep.score}: ${rep.hallazgos.map((h) => h.titulo)})`);
+
+  const man = await fetch(a.base + '/site.webmanifest');
+  assert.equal(man.status, 200);
+  assert.equal(man.headers.get('content-type'), 'application/manifest+json');
+  const mj = await man.json();
+  assert.equal(mj.lang, 'es');
+  assert.deepEqual(mj.icons.map((i) => i.sizes).sort(), ['192x192', '512x512']);
+
+  const ico = Buffer.from(await (await fetch(a.base + '/favicon.ico')).arrayBuffer());
+  assert.deepEqual([...ico.subarray(0, 4)], [0, 0, 1, 0], 'cabecera ICO');
+  assert.equal(ico.readUInt16LE(4), 3, 'favicon.ico con 3 tamaños');
+
+  for (const [ruta, tipo] of [['/favicon.svg', 'image/svg+xml'], ['/favicon.ico', 'image/x-icon'], ['/icon-192.png', 'image/png'], ['/icon-512.png', 'image/png'], ['/og.png', 'image/png'], ['/apple-touch-icon.png', 'image/png']]) {
     const f = await fetch(a.base + ruta);
     assert.equal(f.status, 200, ruta);
     assert.equal(f.headers.get('content-type'), tipo, ruta);
@@ -52,7 +76,20 @@ try {
   assert.match(head.headers.get('content-type'), /text\/html/);
 
   assert.equal((await fetch(a.base + '/../server.mjs')).status, 404, 'no sirve archivos fuera de la lista');
-  assert.equal((await fetch(a.base + '/no-existe.png')).status, 404);
+  const nf = await fetch(a.base + '/no-existe');
+  assert.equal(nf.status, 404);
+  assert.match(nf.headers.get('content-type'), /text\/html/, '404 en HTML');
+  assert.match(await nf.text(), /<meta name="robots" content="noindex">/, '404 no indexable');
+  const api404 = await fetch(a.base + '/api/otra', { method: 'POST' });
+  assert.match(api404.headers.get('content-type'), /json/, 'la API sigue respondiendo JSON');
+
+  // gzip en texto, no en PNG
+  const gz = await fetch(a.base + '/', { headers: { 'accept-encoding': 'gzip' } });
+  assert.equal(gz.headers.get('content-encoding'), 'gzip', 'HTML comprimido');
+  assert.match(gz.headers.get('vary') || '', /accept-encoding/i);
+  const sinGz = await fetch(a.base + '/', { headers: { 'accept-encoding': 'identity' } });
+  assert.equal(sinGz.headers.get('content-encoding'), null, 'sin gzip si el cliente no lo pide');
+  assert.equal((await fetch(a.base + '/og.png', { headers: { 'accept-encoding': 'gzip' } })).headers.get('content-encoding'), null, 'PNG sin gzip');
 } finally { a.cerrar(); }
 
 // Sin SITE_URL: se deduce del host y del protocolo que manda el proxy

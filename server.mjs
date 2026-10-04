@@ -1,5 +1,6 @@
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
+import { gzipSync } from 'node:zlib';
 import { analyze, buildContext, nivelDe } from './lib/analyzer.mjs';
 import { fetchSite } from './lib/fetcher.mjs';
 import { llmReview, llmEnabled } from './lib/llm.mjs';
@@ -11,7 +12,15 @@ const SITE_URL = (process.env.SITE_URL || '').trim().replace(/\/+$/, '');
 const page = await readFile(new URL('./public/index.html', import.meta.url), 'utf8');
 
 // Recursos estáticos permitidos: solo estos, leídos una vez al arrancar
-const ESTATICOS = { '/favicon.svg': 'image/svg+xml', '/og.png': 'image/png', '/apple-touch-icon.png': 'image/png' };
+const ESTATICOS = {
+  '/favicon.ico': 'image/x-icon',
+  '/favicon.svg': 'image/svg+xml',
+  '/apple-touch-icon.png': 'image/png',
+  '/icon-192.png': 'image/png',
+  '/icon-512.png': 'image/png',
+  '/og.png': 'image/png',
+  '/site.webmanifest': 'application/manifest+json',
+};
 const estaticos = new Map(await Promise.all(Object.entries(ESTATICOS).map(async ([ruta, tipo]) =>
   [ruta, { tipo, cuerpo: await readFile(new URL('./public' + ruta, import.meta.url)) }])));
 
@@ -23,6 +32,12 @@ function sitio(req) {
   return `${proto === 'https' ? 'https' : 'http'}://${host.replace(/[^a-z0-9.:[\]-]/gi, '')}`;
 }
 const robots = (base) => `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${base}/sitemap.xml\n`;
+const noEncontrada = `<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex"><title>Página no encontrada · Huella IA</title><link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#3d372f;font:1.05rem/1.6 "Courier New",monospace;color:#1b1a17;padding:1rem}
+main{background:#fbf8f1;max-width:32rem;padding:2rem 2.2rem;box-shadow:3px 4px 0 #c3b08a}h1{margin:0 0 .5rem;font-size:1.6rem}a{color:#23408e}</style></head>
+<body><main><h1>Expediente no encontrado</h1><p>En esta dirección no hay ninguna ficha archivada.</p><p><a href="/">Volver a tomar una huella</a></p></main></body></html>`;
 const sitemap = (base) => `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${base}/</loc><changefreq>monthly</changefreq></url>\n</urlset>\n`;
 
 const cache = new Map(); // url -> { at, data }
@@ -36,7 +51,15 @@ function limited(ip) {
   return list.length > RATE;
 }
 
+// Texto comprimido con gzip si el cliente lo acepta; imágenes tal cual
+const COMPRIMIBLE = /^(text\/|application\/(json|xml|manifest\+json)|image\/svg)/;
+
 const send = (res, code, body, type = 'application/json; charset=utf-8', extra = {}) => {
+  let datos = typeof body === 'string' || Buffer.isBuffer(body) ? body : JSON.stringify(body);
+  if (COMPRIMIBLE.test(type)) {
+    extra = { ...extra, vary: 'accept-encoding' };
+    if (/\bgzip\b/.test(res.req.headers['accept-encoding'] || '')) { datos = gzipSync(datos); extra['content-encoding'] = 'gzip'; }
+  }
   res.writeHead(code, {
     'content-type': type,
     ...extra,
@@ -44,8 +67,7 @@ const send = (res, code, body, type = 'application/json; charset=utf-8', extra =
     'referrer-policy': 'no-referrer',
     'content-security-policy': "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; img-src 'self' data:",
   });
-  if (res.req.method === 'HEAD') return res.end();
-  res.end(typeof body === 'string' || Buffer.isBuffer(body) ? body : JSON.stringify(body));
+  res.end(res.req.method === 'HEAD' ? undefined : datos);
 };
 
 async function readBody(req, limit = 4096) {
@@ -90,6 +112,7 @@ http.createServer(async (req, res) => {
       if (!url || typeof url !== 'string' || url.length > 2000) return send(res, 400, { error: 'Falta la dirección de la página.' });
       return send(res, 200, await analizar(url));
     }
+    if (lee) return send(res, 404, noEncontrada, 'text/html; charset=utf-8');
     send(res, 404, { error: 'No encontrado' });
   } catch (e) {
     send(res, 422, { error: e.message || 'No se pudo analizar la página' });

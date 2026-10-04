@@ -60,7 +60,10 @@ Variables:
 ## SEO
 
 - `<head>` con descripción, canónica, Open Graph, Twitter Card y JSON-LD (`WebApplication`). Las URLs absolutas llevan la marca `{{SITE_URL}}`, que el servidor sustituye al servir la página.
-- El servidor sirve `/robots.txt` (bloquea `/api/`), `/sitemap.xml`, `/favicon.svg`, `/apple-touch-icon.png` y `/og.png`, y responde a `HEAD`.
+- El servidor sirve `/robots.txt` (bloquea `/api/`), `/sitemap.xml`, `/site.webmanifest`, los iconos (`favicon.ico` 16/32/48, `favicon.svg`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`) y `/og.png`; responde a `HEAD`, comprime el texto con gzip y devuelve un 404 en HTML con `noindex`.
+- JSON-LD con `WebSite` (para que Google muestre "Huella IA" como nombre del sitio) y `WebApplication`.
+- Iconos: `public/favicon.svg` es el original; `scripts/favicon-pequeno.svg` es la versión simplificada para 16 y 32 px. Tras regenerar los PNG `scripts/ico-*.png`, `node scripts/ico.mjs` vuelve a armar `public/favicon.ico`.
+- `npm test` comprueba que la página tenga al menos 400 palabras visibles y que quede en ≤ 25 % en su propio medidor.
 - `public/og.png` (1200×630) sale de `scripts/og.html`: si cambias el diseño, abre ese HTML a 1200×630 y vuelve a capturarlo.
 - El servidor lee `public/` al arrancar: tras tocar el HTML hay que reiniciarlo.
 

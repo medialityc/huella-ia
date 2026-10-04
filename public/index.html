@@ -8,8 +8,10 @@
 <link rel="canonical" href="{{SITE_URL}}/">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#3d372f">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_ES">
@@ -28,15 +30,29 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "Huella IA",
-  "url": "{{SITE_URL}}/",
-  "description": "Mide de 0 a 100 cuánto se parece una página web a lo que entrega una IA sin dirección de diseño: kit de componentes, paleta, estructura y textos por defecto.",
-  "applicationCategory": "DesignApplication",
-  "operatingSystem": "Cualquiera con navegador",
-  "inLanguage": "es",
-  "isAccessibleForFree": true,
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "{{SITE_URL}}/#sitio",
+      "name": "Huella IA",
+      "url": "{{SITE_URL}}/",
+      "inLanguage": "es"
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "{{SITE_URL}}/#app",
+      "name": "Huella IA",
+      "url": "{{SITE_URL}}/",
+      "image": "{{SITE_URL}}/og.png",
+      "isPartOf": { "@id": "{{SITE_URL}}/#sitio" },
+      "description": "Mide de 0 a 100 cuánto se parece una página web a lo que entrega una IA sin dirección de diseño: kit de componentes, paleta, estructura y textos por defecto.",
+      "applicationCategory": "DesignApplication",
+      "operatingSystem": "Cualquiera con navegador",
+      "inLanguage": "es",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+    }
+  ]
 }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -177,6 +193,14 @@
   .limpio { border: 1px dashed var(--visado); padding: 1rem 1.2rem; color: var(--visado); }
 
   .notas { margin-top: 1.8rem; color: var(--carbon); font-size: .9rem; }
+
+  .metodo { margin-top: 3rem; padding-top: 1.6rem; border-top: 3px double var(--tinta); }
+  .metodo h2 { margin: 0 0 .7rem; font-size: 1.35rem; }
+  .metodo h3 { margin: 1.8rem 0 .6rem; font-size: 1.1rem; }
+  .metodo p { margin: 0 0 .8rem; max-width: 42rem; }
+  .tramos { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: .4rem 1.4rem; }
+  .tramos dt { font-family: "Courier Prime", monospace; font-weight: 700; white-space: nowrap; }
+  .tramos dd { margin: 0; }
   footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 3px double var(--tinta); color: var(--carbon); font-size: .88rem; }
   footer b { color: var(--tinta); }
 
@@ -194,6 +218,8 @@
     .indicio .ficha .pts { font-size: 1.8rem; }
     .protocolo dl { grid-template-columns: 1fr; gap: .1rem; }
     .protocolo dd { margin-bottom: .5rem; }
+    .tramos { grid-template-columns: 1fr; gap: .1rem; }
+    .tramos dd { margin-bottom: .6rem; }
   }
   @media (prefers-reduced-motion: reduce) {
     .sello.cae { animation: none; }
@@ -265,8 +291,32 @@
         <div class="notas" id="notas"></div>
       </section>
 
+      <section class="metodo" aria-labelledby="t-metodo">
+        <h2 id="t-metodo">Cómo se llega a la cifra</h2>
+        <p>Huella IA descarga el HTML de la página, hasta seis hojas de estilo y hasta seis archivos JavaScript del mismo dominio. En las webs montadas con Vite, Next o similares, los textos y las clases viven dentro del JavaScript, así que también se leen.</p>
+        <p>Sobre ese material se buscan 33 señales repartidas en cuatro áreas. Cada señal tiene un peso máximo y cada área un tope: origen y kit hasta 30 puntos, lenguaje visual hasta 30, estructura hasta 20 y textos hasta 20. La suma es la cifra final, de 0 a 100.</p>
+
+        <h3>Qué significa cada tramo</h3>
+        <dl class="tramos">
+          <dt>0 a 20, artesanal</dt>
+          <dd>Apenas hay patrones de plantilla y se nota una dirección propia.</dd>
+          <dt>21 a 40, con criterio</dt>
+          <dd>Queda algún default suelto, pero la identidad se sostiene.</dd>
+          <dt>41 a 60, genérico</dt>
+          <dd>Varias decisiones salieron por defecto y la página se confunde con otras del montón.</dd>
+          <dt>61 a 80, plantilla IA</dt>
+          <dd>Casi todo lo visual y lo escrito es lo que entrega un generador cuando nadie le da instrucciones.</dd>
+          <dt>81 a 100, huella fuerte</dt>
+          <dd>Kit, paleta, estructura y textos de fábrica, casi sin intervención.</dd>
+        </dl>
+
+        <h3>Lo que la cifra no dice</h3>
+        <p>No demuestra quién hizo la página ni con qué herramienta. Una web escrita a mano con Tailwind y sus colores de serie puede puntuar alto, y una generada con IA pero dirigida con criterio puede quedar en la zona artesanal. Tampoco juzga si el diseño es bonito o si vende: cuenta decisiones que se repiten en miles de páginas.</p>
+        <p>Las señales envejecen. Lo que hoy delata una plantilla dentro de unos meses será otra cosa, por eso la lista se revisa a menudo. Y si una página carga sus textos desde una API después de abrirse, solo se lee una parte; la ficha lo avisa con una confianza baja.</p>
+      </section>
+
       <footer>
-        <b>Advertencia.</b> No prueba quién hizo la página: mide patrones que hoy salen por defecto al generar con IA. Una página hecha a mano puede puntuar si usa esos mismos defaults, y una hecha con IA puede puntuar bajo si se dirigió bien.
+        <b>Huella IA.</b> Ficha de identificación para páginas web. Mide patrones, no autoría.
       </footer>
     </main>
   </div>
