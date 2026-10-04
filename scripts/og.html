@@ -1,0 +1,64 @@
+<!doctype html>
+<!-- Fuente de public/og.png (1200×630). Para regenerarla: abrir a 1200×630 y hacer captura. -->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@800&family=Courier+Prime:wght@400;700&family=Libre+Franklin:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; width: 1200px; height: 630px; background: #3d372f; font-family: "Libre Franklin", sans-serif; color: #1b1a17; overflow: hidden; }
+  .carpeta { position: absolute; left: 60px; top: 70px; width: 1080px; height: 520px; background: #e2d4b4; border: 1px solid #c3b08a; padding: 18px; }
+  .pestana { position: absolute; left: 60px; top: 30px; height: 42px; padding: 8px 34px 0 22px; background: #e2d4b4; border: 1px solid #c3b08a; border-bottom: 0; clip-path: polygon(0 0, 88% 0, 100% 100%, 0 100%); font: 20px "Courier Prime", monospace; color: #5d5850; }
+  .hoja { position: relative; height: 100%; background: #fbf8f1; box-shadow: 4px 5px 0 #c3b08a; padding: 44px 56px; display: grid; grid-template-columns: 1fr 250px; gap: 40px; }
+  .plantilla { font-family: "Big Shoulders Stencil Display", sans-serif; font-weight: 800; line-height: .88; }
+  h1 { margin: 0; font-size: 104px; }
+  .reg { font: 20px "Courier Prime", monospace; color: #5d5850; margin: 14px 0 0; }
+  .lema { font-size: 33px; line-height: 1.22; font-weight: 600; margin: 26px 0 0; max-width: 560px; }
+  .fila { display: flex; align-items: center; gap: 30px; margin-top: 28px; }
+  .cifra { font-size: 120px; }
+  .cifra small { font-size: .42em; }
+  .sello { font-size: 52px; color: #b3261e; border: 6px double #b3261e; border-radius: 5px; padding: 6px 18px 2px; transform: rotate(-7deg); opacity: .92; }
+  .impresion { border: 1.5px solid #1b1a17; background: #fff; padding: 12px 12px 8px; align-self: center; }
+  .impresion svg { display: block; width: 100%; }
+  .impresion path { fill: none; stroke: #c9c2b4; stroke-width: 1.6; stroke-linecap: round; }
+  .impresion path.tinta { stroke: #1b1a17; stroke-width: 2.1; }
+  .impresion p { margin: 6px 0 0; border-top: 1px solid #c9c2b4; padding-top: 6px; text-align: center; font: 17px "Courier Prime", monospace; color: #5d5850; }
+</style>
+</head>
+<body>
+<div class="pestana">Expediente 2026-1004</div>
+<div class="carpeta">
+  <div class="hoja">
+    <div>
+      <h1 class="plantilla">Huella IA</h1>
+      <p class="lema">¿Tu web parece hecha por una IA sin dirección? Pega la dirección y recibe la ficha.</p>
+      <div class="fila">
+        <span class="cifra plantilla">48<small>%</small></span>
+        <span class="sello plantilla">GENÉRICO</span>
+      </div>
+    </div>
+    <figure class="impresion" style="margin:0">
+      <svg id="huella" viewBox="0 0 120 150"></svg>
+      <p>8 de 16 crestas marcadas</p>
+    </figure>
+  </div>
+</div>
+<script>
+  const svg = document.getElementById('huella'), ns = 'http://www.w3.org/2000/svg';
+  for (let i = 0; i < 16; i++) {
+    const cx = 58 + i * 0.25, cy = 76 - i * 0.5;
+    const a0 = ((i * 137) % 360) * Math.PI / 180, giro = (330 - (i % 3) * 18) * Math.PI / 180;
+    let d = '';
+    for (let k = 0; k <= 80; k++) {
+      const t = k / 80, a = a0 + giro * t;
+      const r = (2.5 + i * 3.7 + t * 2.4) * (1 + 0.025 * Math.sin(a * 5 + i));
+      d += (k ? 'L' : 'M') + (cx + Math.cos(a) * r * 0.82).toFixed(1) + ' ' + (cy + Math.sin(a) * r).toFixed(1);
+    }
+    const p = document.createElementNS(ns, 'path');
+    p.setAttribute('d', d);
+    if (i < 8) p.classList.add('tinta');
+    svg.append(p);
+  }
+</script>
+</body>
+</html>

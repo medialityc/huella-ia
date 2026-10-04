@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Huella IA: ¿tu web parece hecha por una IA sin dirección?</title>
+<meta name="description" content="Analiza gratis cualquier página web y mide de 0 a 100 cuánto se parece a lo que entrega una IA sin dirección de diseño, con cada indicio y cómo corregirlo.">
+<link rel="canonical" href="{{SITE_URL}}/">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#3d372f">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_ES">
+<meta property="og:site_name" content="Huella IA">
+<meta property="og:title" content="Huella IA: ¿tu web parece hecha por una IA sin dirección?">
+<meta property="og:description" content="Pega una dirección y recibe la ficha: cifra de 0 a 100, medición por área e indicios con su corrección.">
+<meta property="og:url" content="{{SITE_URL}}/">
+<meta property="og:image" content="{{SITE_URL}}/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ficha de Huella IA con una cifra de 48 % y el sello Genérico">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Huella IA: ¿tu web parece hecha por una IA sin dirección?">
+<meta name="twitter:description" content="Pega una dirección y recibe la ficha: cifra de 0 a 100, medición por área e indicios con su corrección.">
+<meta name="twitter:image" content="{{SITE_URL}}/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Huella IA",
+  "url": "{{SITE_URL}}/",
+  "description": "Mide de 0 a 100 cuánto se parece una página web a lo que entrega una IA sin dirección de diseño: kit de componentes, paleta, estructura y textos por defecto.",
+  "applicationCategory": "DesignApplication",
+  "operatingSystem": "Cualquiera con navegador",
+  "inLanguage": "es",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@700;800&family=Courier+Prime:wght@400;700&family=Libre+Franklin:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --mesa: #3d372f;
+    --carpeta: #e2d4b4;
+    --carpeta-borde: #c3b08a;
+    --papel: #fbf8f1;
+    --tinta: #1b1a17;
+    --carbon: #5d5850;
+    --lapiz: #c9c2b4;
+    --tampon: #b3261e;
+    --visado: #2f5d3a;
+    --boli: #23408e;
+    --sello: var(--tampon);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--mesa); color: var(--tinta);
+    font: 400 1rem/1.6 "Libre Franklin", system-ui, sans-serif;
+    padding: 2.5rem 1rem 3rem;
+  }
+  .maquina { font-family: "Courier Prime", "Courier New", monospace; }
+  .plantilla { font-family: "Big Shoulders Stencil Display", "Arial Narrow", sans-serif; font-weight: 800; line-height: .9; }
+
+  /* Carpeta con pestaña y hoja dentro */
+  .carpeta { max-width: 54rem; margin: 0 auto; position: relative; padding-top: 2.2rem; }
+  .pestana {
+    position: absolute; top: 0; left: 0; height: 2.4rem; padding: .35rem 1.4rem 0 1.1rem;
+    background: var(--carpeta); border: 1px solid var(--carpeta-borde); border-bottom: 0;
+    clip-path: polygon(0 0, 88% 0, 100% 100%, 0 100%);
+    color: var(--carbon); font-size: .9rem;
+  }
+  .carpeta-cuerpo { background: var(--carpeta); border: 1px solid var(--carpeta-borde); padding: .9rem; }
+  .hoja {
+    background: var(--papel); padding: 2.2rem clamp(1.1rem, 4vw, 3rem) 2.4rem;
+    box-shadow: 3px 4px 0 var(--carpeta-borde);
+  }
+
+  header { display: grid; grid-template-columns: 1fr auto; gap: .5rem 2rem; align-items: end; border-bottom: 3px double var(--tinta); padding-bottom: 1.1rem; }
+  header h1 { margin: 0; font-size: clamp(3.4rem, 9vw, 5.2rem); }
+  .registro { margin: 0; text-align: right; font-size: .95rem; color: var(--carbon); line-height: 1.45; }
+  .registro b { color: var(--tinta); font-weight: 700; }
+  header .bajada { grid-column: 1 / -1; margin: .5rem 0 0; max-width: 40rem; }
+
+  form { margin: 2rem 0 0; }
+  label { display: block; font-weight: 600; margin-bottom: .35rem; }
+  .fila { display: flex; gap: .8rem; flex-wrap: wrap; align-items: end; }
+  input {
+    flex: 1 1 18rem; font: 400 1.15rem "Courier Prime", monospace; color: var(--boli);
+    padding: .55rem .2rem .35rem; background: transparent; border: 0; border-bottom: 2px solid var(--tinta); border-radius: 0;
+  }
+  input::placeholder { color: var(--lapiz); }
+  button {
+    font: 600 1rem "Libre Franklin", sans-serif; padding: .75rem 1.5rem; cursor: pointer;
+    background: var(--tinta); color: var(--papel); border: 0; border-radius: 2px;
+  }
+  button:hover { background: var(--tampon); }
+  button[disabled] { opacity: .6; cursor: progress; background: var(--tinta); }
+  :focus-visible { outline: 3px solid var(--boli); outline-offset: 3px; }
+  .estado { min-height: 1.6rem; margin: .8rem 0 0; color: var(--carbon); }
+  .estado.error { color: var(--tampon); }
+
+  /* Protocolo: visible hasta el primer análisis */
+  .protocolo { margin-top: 2rem; padding: 1.2rem 1.3rem 1.3rem; border: 1px dashed var(--carbon); }
+  .protocolo h2 { margin: 0 0 .7rem; font-size: 1.05rem; }
+  .protocolo dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: .45rem 1.2rem; }
+  .protocolo dt { font-weight: 700; white-space: nowrap; }
+  .protocolo dt span { color: var(--carbon); font-weight: 400; }
+  .protocolo dd { margin: 0; color: var(--carbon); }
+  .con-informe .protocolo { display: none; }
+
+  #informe { display: none; margin-top: 2.2rem; }
+  #informe.visible { display: block; }
+  .sujeto { margin: 0 0 1.4rem; font-size: 1rem; word-break: break-all; }
+  .sujeto span { color: var(--carbon); }
+
+  .veredicto { display: grid; grid-template-columns: 11rem 1fr; gap: 1.5rem 2.4rem; align-items: start; }
+  .impresion { margin: 0; border: 1px solid var(--tinta); padding: .6rem .6rem .4rem; background: #fff; }
+  .impresion svg { display: block; width: 100%; height: auto; }
+  .impresion path { fill: none; stroke: var(--lapiz); stroke-width: 1.6; stroke-linecap: round; transition: stroke .5s ease-out; }
+  .impresion path.tinta { stroke: var(--tinta); stroke-width: 2.1; }
+  .impresion figcaption { border-top: 1px solid var(--lapiz); margin-top: .4rem; padding-top: .3rem; font-size: .82rem; color: var(--carbon); text-align: center; }
+
+  .dictamen { position: relative; }
+  .cifra { font-size: clamp(6rem, 16vw, 8.5rem); margin: -.3rem 0 0; }
+  .cifra small { font-size: .42em; margin-left: .05em; }
+  .sello {
+    display: inline-block; margin: .9rem 0 .2rem; padding: .3rem .9rem .2rem;
+    font-size: 2.1rem; color: var(--sello); border: 4px double var(--sello); border-radius: 4px;
+    transform: rotate(-6deg); transform-origin: left center; opacity: .92;
+    mix-blend-mode: multiply;
+  }
+  .sello.cae { animation: estampar .38s cubic-bezier(.2, .9, .3, 1.2) both; }
+  @keyframes estampar {
+    0% { transform: rotate(-14deg) scale(1.9); opacity: 0; }
+    70% { transform: rotate(-5deg) scale(.96); opacity: 1; }
+    100% { transform: rotate(-6deg) scale(1); opacity: .92; }
+  }
+  .dictamen .texto { margin: .7rem 0 0; max-width: 30rem; font-size: 1.05rem; }
+  .dictamen .conf { margin: .3rem 0 0; color: var(--carbon); font-size: .95rem; }
+
+  h3 { font-size: 1.2rem; margin: 0 0 .8rem; }
+  .medicion { margin-top: 2.6rem; }
+  .area { display: grid; grid-template-columns: 11rem 1fr 4.5rem 4.5rem; gap: .9rem; align-items: center; padding: .55rem 0; border-bottom: 1px solid var(--lapiz); }
+  .area .nombre { font-weight: 600; }
+  .regla {
+    position: relative; height: 1rem; border: 1px solid var(--tinta);
+    background: repeating-linear-gradient(to right, var(--lapiz) 0 1px, transparent 1px 10%);
+  }
+  .regla .lleno { position: absolute; inset: 0 auto 0 0; background: var(--tinta); }
+  .regla .limite { position: absolute; top: -.35rem; bottom: -.35rem; width: 2px; background: var(--tampon); }
+  .area .num { text-align: right; white-space: nowrap; }
+  .area .flag { font-weight: 700; }
+  .alto-t { color: var(--tampon); }
+  .ok-t { color: var(--visado); }
+  .leyenda { margin: .6rem 0 0; font-size: .88rem; color: var(--carbon); }
+  .leyenda i { display: inline-block; width: 2px; height: .9rem; background: var(--tampon); vertical-align: -.15rem; margin-right: .4rem; }
+
+  .opinion { margin: 2.4rem 0 0; padding: 1rem 1.2rem; border-left: 4px solid var(--boli); background: #f1efe7; }
+  .opinion h3 { margin: 0 0 .3rem; font-size: 1.05rem; color: var(--boli); }
+  .opinion ul { margin: .3rem 0 0; padding-left: 1.2rem; }
+
+  .indicios { margin-top: 2.6rem; }
+  .indicios ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+  .indicio { display: grid; grid-template-columns: 8rem 1fr; border: 1px solid var(--tinta); background: #fff; }
+  .indicio .ficha { border-right: 1px solid var(--tinta); padding: .7rem .7rem; background: var(--carpeta); }
+  .indicio .ficha .n { display: block; font-size: .85rem; color: var(--carbon); white-space: nowrap; }
+  .indicio .ficha .pts { display: block; font-size: 2.3rem; color: var(--tampon); }
+  .indicio .cuerpo { padding: .75rem 1rem .85rem; }
+  .indicio .tit { font-weight: 700; margin: 0; font-size: 1.05rem; }
+  .indicio .ev { margin: .35rem 0 0; font-size: .92rem; background: #f3efe4; padding: .25rem .45rem; overflow-wrap: anywhere; }
+  .indicio .fix { margin: .5rem 0 0; color: var(--boli); font-style: italic; }
+  .indicio .fix b { font-style: normal; }
+  .limpio { border: 1px dashed var(--visado); padding: 1rem 1.2rem; color: var(--visado); }
+
+  .notas { margin-top: 1.8rem; color: var(--carbon); font-size: .9rem; }
+  footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 3px double var(--tinta); color: var(--carbon); font-size: .88rem; }
+  footer b { color: var(--tinta); }
+
+  @media (max-width: 40rem) {
+    body { padding: 1.5rem .6rem 2rem; }
+    .carpeta-cuerpo { padding: .45rem; }
+    header { grid-template-columns: 1fr; }
+    .registro { text-align: left; }
+    .veredicto { grid-template-columns: 1fr; }
+    .impresion { width: 9rem; }
+    .area { grid-template-columns: 1fr 4rem 4rem; }
+    .area .regla { grid-column: 1 / -1; grid-row: 2; }
+    .indicio { grid-template-columns: 1fr; }
+    .indicio .ficha { border-right: 0; border-bottom: 1px solid var(--tinta); display: flex; justify-content: space-between; align-items: baseline; }
+    .indicio .ficha .pts { font-size: 1.8rem; }
+    .protocolo dl { grid-template-columns: 1fr; gap: .1rem; }
+    .protocolo dd { margin-bottom: .5rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sello.cae { animation: none; }
+    .impresion path { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="carpeta">
+  <div class="pestana maquina">Huella IA</div>
+  <div class="carpeta-cuerpo">
+    <main class="hoja" id="hoja">
+      <header>
+        <h1 class="plantilla">Huella IA</h1>
+        <p class="registro maquina">Expediente <b id="exp">—</b><br>Fecha <b id="fecha">—</b></p>
+        <p class="bajada">Ficha de identificación para páginas web. Compara lo que tiene una página con lo que entrega una IA sin dirección de diseño: kit de componentes, paleta, estructura y textos que salen por defecto.</p>
+      </header>
+
+      <form id="f">
+        <label for="url">Sitio investigado</label>
+        <div class="fila">
+          <input id="url" name="url" type="text" inputmode="url" autocomplete="url" placeholder="tu-cliente.com" required>
+          <button id="go" type="submit">Tomar la huella</button>
+        </div>
+        <p class="estado maquina" id="estado" role="status" aria-live="polite"></p>
+      </form>
+
+      <section class="protocolo" aria-labelledby="t-protocolo">
+        <h2 id="t-protocolo">Qué se revisa</h2>
+        <dl>
+          <dt>Origen y kit <span>(30)</span></dt>
+          <dd>Rastros de los generadores de webs con IA, shadcn con sus colores de fábrica, Tailwind por CDN, Lucide en cada línea.</dd>
+          <dt>Lenguaje visual <span>(30)</span></dt>
+          <dd>Inter o Geist, índigo de Tailwind, texto con degradado, el mismo radio y la misma sombra en cada caja.</dd>
+          <dt>Estructura <span>(20)</span></dt>
+          <dd>El esqueleto de landing SaaS, etiquetas sobre los títulos, flechas en los botones, animación en cada sección.</dd>
+          <dt>Textos <span>(20)</span></dt>
+          <dd>Vocabulario de relleno, frases hechas de modelo de lenguaje, nombres inventados y cifras de adorno.</dd>
+        </dl>
+      </section>
+
+      <section id="informe" aria-labelledby="t-informe">
+        <p class="sujeto maquina"><span>Sujeto:</span> <span id="muestra"></span></p>
+        <div class="veredicto">
+          <figure class="impresion">
+            <svg id="huella" viewBox="0 0 120 150" aria-hidden="true"></svg>
+            <figcaption class="maquina" id="impresion-pie">Impresión del sitio</figcaption>
+          </figure>
+          <div class="dictamen">
+            <p class="cifra plantilla"><span id="score">0<small>%</small></span></p>
+            <h2 class="sello plantilla" id="t-informe"></h2>
+            <p class="texto" id="nivel-texto"></p>
+            <p class="conf" id="conf"></p>
+          </div>
+        </div>
+
+        <div class="medicion">
+          <h3>Medición por área</h3>
+          <div id="areas"></div>
+          <p class="leyenda"><i></i>La raya roja marca lo normal en una página con dirección propia.</p>
+        </div>
+
+        <div class="opinion" id="opinion" hidden></div>
+
+        <div class="indicios">
+          <h3>Indicios y cómo corregirlos</h3>
+          <ol id="lista"></ol>
+        </div>
+        <div class="notas" id="notas"></div>
+      </section>
+
+      <footer>
+        <b>Advertencia.</b> No prueba quién hizo la página: mide patrones que hoy salen por defecto al generar con IA. Una página hecha a mano puede puntuar si usa esos mismos defaults, y una hecha con IA puede puntuar bajo si se dirigió bien.
+      </footer>
+    </main>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Número de expediente y fecha de hoy
+const hoy = new Date();
+const dos = (n) => String(n).padStart(2, '0');
+$('exp').textContent = `${hoy.getFullYear()}-${dos(hoy.getMonth() + 1)}${dos(hoy.getDate())}-${dos(hoy.getHours())}${dos(hoy.getMinutes())}`;
+$('fecha').textContent = hoy.toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' });
+
+// Huella dactilar en espiral: cada cresta es casi una vuelta completa con un corte, recortada a la yema.
+// Se entinta de dentro hacia fuera según la cifra.
+const CRESTAS = 16;
+(function dibujarHuella() {
+  const svg = $('huella');
+  const ns = 'http://www.w3.org/2000/svg';
+  const clip = document.createElementNS(ns, 'clipPath'); clip.id = 'yema';
+  const yema = document.createElementNS(ns, 'ellipse');
+  [['cx', 60], ['cy', 76], ['rx', 52], ['ry', 70]].forEach(([k, v]) => yema.setAttribute(k, v));
+  clip.append(yema); svg.append(clip);
+  const g = document.createElementNS(ns, 'g'); g.setAttribute('clip-path', 'url(#yema)'); svg.append(g);
+  for (let i = 0; i < CRESTAS; i++) {
+    const cx = 58 + i * 0.25, cy = 76 - i * 0.5;
+    const a0 = ((i * 137) % 360) * Math.PI / 180, giro = (330 - (i % 3) * 18) * Math.PI / 180;
+    let d = '';
+    for (let k = 0; k <= 80; k++) {
+      const t = k / 80, a = a0 + giro * t;
+      const r = (2.5 + i * 3.7 + t * 2.4) * (1 + 0.025 * Math.sin(a * 5 + i));
+      d += (k ? 'L' : 'M') + (cx + Math.cos(a) * r * 0.82).toFixed(1) + ' ' + (cy + Math.sin(a) * r).toFixed(1);
+    }
+    const p = document.createElementNS(ns, 'path');
+    p.setAttribute('d', d);
+    g.append(p);
+  }
+})();
+
+function entintar(score) {
+  const n = Math.round((score / 100) * CRESTAS);
+  [...$('huella').querySelectorAll('path')].forEach((p, i) => p.classList.toggle('tinta', i < n));
+  $('impresion-pie').textContent = `${n} de ${CRESTAS} crestas marcadas`;
+}
+
+$('f').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const url = $('url').value.trim();
+  if (!url) return;
+  $('go').disabled = true;
+  $('estado').className = 'estado maquina';
+  $('estado').textContent = 'Requisando el HTML y sus hojas de estilo…';
+  const t = setTimeout(() => { $('estado').textContent = 'Revisando bundles y textos…'; }, 3500);
+  try {
+    const r = await fetch('/api/analizar', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ url }) });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || 'No se pudo analizar la página');
+    pintar(data);
+    $('estado').textContent = '';
+  } catch (err) {
+    $('estado').className = 'estado maquina error';
+    $('estado').textContent = err.message;
+  } finally {
+    clearTimeout(t);
+    $('go').disabled = false;
+  }
+});
+
+function pintar(d) {
+  $('hoja').classList.add('con-informe');
+  $('muestra').textContent = d.finalUrl;
+  $('score').firstChild.nodeValue = d.score;
+  document.documentElement.style.setProperty('--sello', d.score > 40 ? 'var(--tampon)' : 'var(--visado)');
+
+  const s = $('t-informe');
+  s.textContent = d.nivel.nombre.toUpperCase();
+  s.classList.remove('cae'); void s.offsetWidth;
+  if (!quieto) s.classList.add('cae');
+  entintar(d.score);
+
+  $('nivel-texto').textContent = d.nivel.texto;
+  $('conf').textContent = `Confianza ${d.meta.confianza}. ${d.meta.palabras} palabras leídas.` + (d.ia && d.ia.score != null ? ` Heurística ${d.heuristico}%, lectura de Claude ${d.ia.score}%.` : '');
+
+  const areas = $('areas'); areas.replaceChildren();
+  d.categorias.forEach((c) => {
+    const ref = Math.round(c.max * 0.25);
+    const alto = c.puntos > ref;
+    const fila = el('div', 'area');
+    const regla = el('div', 'regla');
+    regla.setAttribute('role', 'img');
+    regla.setAttribute('aria-label', `${c.puntos} de ${c.max}; lo normal llega a ${ref}`);
+    const lleno = el('span', 'lleno'); lleno.style.width = (c.puntos / c.max * 100) + '%';
+    const limite = el('span', 'limite'); limite.style.left = (ref / c.max * 100) + '%';
+    regla.append(lleno, limite);
+    fila.append(el('span', 'nombre', c.nombre), regla, el('span', 'num maquina', `${c.puntos} / ${c.max}`), el('span', 'flag maquina ' + (alto ? 'alto-t' : 'ok-t'), alto ? 'Alto' : 'Normal'));
+    areas.append(fila);
+  });
+
+  const op = $('opinion');
+  if (d.ia && d.ia.score != null) {
+    op.hidden = false; op.replaceChildren(el('h3', null, `Segunda opinión, leída por Claude: ${d.ia.score}% genérico`));
+    const ul = el('ul'); (d.ia.razones || []).forEach((x) => ul.append(el('li', null, x))); op.append(ul);
+  } else op.hidden = true;
+
+  const ol = $('lista'); ol.replaceChildren();
+  if (!d.hallazgos.length) ol.append(el('li', 'limpio', 'Sin indicios: no aparece ningún patrón de plantilla.'));
+  d.hallazgos.forEach((h, i) => {
+    const li = el('li', 'indicio');
+    const ficha = el('div', 'ficha');
+    ficha.append(el('span', 'n maquina', `Indicio n.º ${i + 1}`), el('span', 'pts plantilla', `+${h.puntos}`));
+    const cuerpo = el('div', 'cuerpo');
+    cuerpo.append(el('p', 'tit', h.titulo));
+    if (h.evidencia.length) cuerpo.append(el('p', 'ev maquina', h.evidencia.join(' | ')));
+    const fix = el('p', 'fix'); fix.append(el('b', null, 'Cómo corregirlo: '), document.createTextNode(h.arreglo));
+    cuerpo.append(fix);
+    li.append(ficha, cuerpo); ol.append(li);
+  });
+
+  $('notas').textContent = d.meta.notas.join(' ');
+  $('informe').classList.add('visible');
+  $('informe').scrollIntoView({ behavior: quieto ? 'auto' : 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>

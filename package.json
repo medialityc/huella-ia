@@ -1,0 +1,16 @@
+{
+  "name": "huella-ia",
+  "version": "1.0.0",
+  "description": "Mide qué tan genérica (con huella de IA sin dirección) es una página web",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=20" },
+  "bin": { "huella": "bin/huella.mjs" },
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node --watch server.mjs",
+    "huella": "node bin/huella.mjs",
+    "test": "node test/run.mjs && node test/server.mjs",
+    "sync-skill": "node scripts/sync-skill.mjs"
+  }
+}
